@@ -16,7 +16,7 @@ def version_control(func):
             return str(e)
         # 没有出现异常，为有效操作
         self.operation_num += 1
-        if self.operation_num >= self.save_version_interval:
+        if CONFIG.record_history and self.operation_num >= self.save_version_interval:
             self.save_as_history()
             self.operation_num = 0
         else:
@@ -52,19 +52,21 @@ class AllData(object):
     def load_general_foods():
         json_data = load_json_file(CONFIG.general_foods_file)
         result = dict()
-        for food in json_data:
-            obj = GeneralFoodNode('', '', '', '')
-            obj.from_json(food)
-            result[obj.id] = obj
+        for field, nodes in json_data.items():
+            result[field] = dict()
+            for food in nodes:
+                obj = GeneralFoodNode('', '', '', '')
+                obj.from_json(food)
+                result[field][obj.id] = obj
         return result
 
     @staticmethod
     def load_standard_attributes():
         json_data = load_json_file(CONFIG.standard_attributes_file)
         result = dict()
-        for food in json_data:
+        for attribute in json_data.items():
             obj = StandardAttribute('', '', '')
-            obj.from_json(food)
+            obj.from_json(attribute)
             result[obj.id] = obj
         return result
 
@@ -72,7 +74,10 @@ class AllData(object):
         # 每次操作后保存修改
         save_json_file(CONFIG.standard_foods_file, [x.to_json() for x in self.standard_foods.values()])
         save_json_file(CONFIG.standard_attributes_file, [x.to_json() for x in self.standard_attributes.values()])
-        save_json_file(CONFIG.general_foods_file, [x.to_json() for x in self.general_foods.values()])
+        general_json_data = {}
+        for field, nodes in self.general_foods.items():
+            general_json_data[field] = [x.to_json() for x in nodes.values()]
+        save_json_file(CONFIG.general_foods_file, general_json_data)
 
     def save_as_history(self):
         # 保存当前状态，并存为历史版本
@@ -94,14 +99,14 @@ class AllData(object):
         :param parent_id: 其父节点id
         :param name: 食品名称
         :param note: 备注
-        :return: 新增结点id if 操作成功 else 错误信息的字符串
+        :return: 新增结点id if 操作成功 else 错误信息
         """
         if parent_id not in self.standard_foods:
             # this should not happen without bug
-            raise '新增标准食品失败！父节点%s不存在！' % parent_id
+            raise Exception('新增标准食品失败！父节点%s不存在！' % parent_id)
         parent_node: StandardFoodNode = self.standard_foods[parent_id]
         if parent_node.use_flag is False:
-            return '新增标准食品失败！父节点已被移除，建议刷新页面以查看最新版本'
+            raise Exception('新增标准食品失败！父节点已被移除，建议刷新页面以查看最新版本')
         # 从全局CONFIG中申请新id
         new_id = CONFIG.generate_new_id(field='食品')
         # 创建新结点
@@ -110,6 +115,36 @@ class AllData(object):
         parent_node.add_child(new_id)
         # 加入到standard_foods集合中
         self.standard_foods[new_id] = new_node
+        return new_id
+
+    @version_control
+    def insert_general_food(self, field: str, parent_id: str, name: str, note: str = '', ontology: list = None):
+        """
+        新增其他领域的食品结点
+        :param field: 领域名称
+        :param parent_id: 父节点id
+        :param name: 食品名称
+        :param note: 备注
+        :param ontology: 本体id的list
+        :return: 新增结点id if 操作成功 else 错误信息
+        """
+        if field not in self.general_foods:
+            raise Exception('新增食品结点失败，领域%s不存在' % field)
+        field_foods = self.general_foods[field]
+        if parent_id not in field_foods:
+            raise Exception('新增食品结点失败，父节点%s不存在' % parent_id)
+        parent_node: GeneralFoodNode = field_foods[parent_id]
+        if parent_node.use_flag is False:
+            raise Exception('新增标准食品失败！父节点已被移除，建议刷新页面以查看最新版本')
+        # 从全局CONFIG中申请新id
+        new_id = CONFIG.generate_new_id(field=field)
+        # 创建新结点
+        new_node = GeneralFoodNode(node_id=new_id, name=name, parent_id=parent_id, field=field, ontology=ontology,
+                                   note=note)
+        # 父结点的children中加入它的id
+        parent_node.add_child(new_id)
+        # 加入到general_foods集合中
+        self.general_foods[field][new_id] = new_node
         return new_id
 
     @version_control
@@ -180,7 +215,21 @@ class AllData(object):
         :return:
         """
         # tips:  用CONFIG.generate_new_id(field='标准属性') 来自动生成新id，参考insert_standard_food
-        pass
+        if parent_id not in self.standard_attributes:
+            # this should not happen without bug
+            raise '新增标准属性失败！父节点%s不存在！' % parent_id
+        parent_node: StandardAttribute = self.standard_attributes[parent_id]
+        if parent_node.use_flag is False:
+            return '新增标准属性失败！父节点已被移除，建议刷新页面以查看最新版本'
+        # 从全局CONFIG中申请新id
+        new_id = CONFIG.generate_new_id(field='属性')
+        # 创建新结点
+        new_node = StandardAttribute(attribute_id=new_id, name=name, parent_id=parent_id, note=note)
+        # 父结点的children中加入它的id
+        parent_node.add_child(new_id)
+        # 加入到standard_attributes集合中
+        self.standard_attributes[new_id] = new_node
+        return new_id
 
     @version_control
     def delete_standard_attribute(self, attribute_id: str):
@@ -203,7 +252,7 @@ class AllData(object):
         """
         if field not in self.general_foods:
             raise Exception('新增映射关系失败！领域名称“%s”错误!' % field)
-        general_node: GeneralFoodNode = self.general_foods[field].get([general_id], None)
+        general_node: GeneralFoodNode = self.general_foods[field].get(general_id, None)
         if general_node is None:
             raise Exception('新增映射关系失败！领域“%s”中没有id为%s的结点！' % (field, general_node))
         standard_node: StandardFoodNode = self.standard_foods.get(standard_id, None)
