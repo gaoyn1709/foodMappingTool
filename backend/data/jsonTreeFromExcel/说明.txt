@@ -1,0 +1,4 @@
+此文件夹为从excel文件导入为系统所需json文件的过程中产生的临时文件
+*Code2SsystemID.json 是字典，key是原excel中的编码，value是系统中的id
+*Tree.json 是树状json文件，由excel转换而来
+由此得到最终save文件夹中的系统使用的json文件
