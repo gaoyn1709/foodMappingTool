@@ -1,0 +1,5 @@
+.idea/
+*.pyc
+backend/data/history/
+backend/static/
+backend/templates/
