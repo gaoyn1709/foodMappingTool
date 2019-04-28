@@ -2,4 +2,4 @@
 *.pyc
 backend/data/history/
 backend/static/
-backend/templates/
+backend/data/save/
