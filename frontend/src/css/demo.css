@@ -1,0 +1,19 @@
+.GRE {
+    color: green;
+}
+
+.GRE .BLA {
+    color: rgba(0, 0, 0, 0.65);
+}
+.p1 {
+    font-weight: bold;
+    font-size: 1.2em
+}
+
+.p2 {
+    color: orange;
+}
+
+.p3 {
+    color: lime;
+}

@@ -297,18 +297,18 @@ all_data = AllData()  # singleton
 def test():
     # you can write your own test codes here for test purpose
     # test for insert_standard_foods
-    root_id = CONFIG.generate_new_id('食品')
-    all_data.standard_foods[root_id] = StandardFoodNode(root_id, 'root', '')
-    all_data.insert_standard_food('食品0', 'food1')
-    all_data.insert_standard_food('食品0', 'food2')
-    all_data.insert_standard_food('食品1', 'food3')
-    all_data.insert_standard_food('食品1', 'food4')
-    all_data.insert_standard_food('食品3', 'food5')
-    all_data.insert_standard_food('食品0', 'food6')
-    all_data.insert_standard_food('食品0', 'food7')
-    all_data.insert_standard_food('食品1', 'food8')
-    all_data.insert_standard_food('食品1', 'food9')
-    all_data.insert_standard_food('食品3', 'food10')
+    # root_id = CONFIG.generate_new_id('食品')
+    # all_data.standard_foods[root_id] = StandardFoodNode(root_id, 'root', '')
+    # all_data.insert_standard_food('食品0', 'food1')
+    # all_data.insert_standard_food('食品0', 'food2')
+    # all_data.insert_standard_food('食品1', 'food3')
+    # all_data.insert_standard_food('食品1', 'food4')
+    # all_data.insert_standard_food('食品3', 'food5')
+    # all_data.insert_standard_food('食品0', 'food6')
+    # all_data.insert_standard_food('食品0', 'food7')
+    # all_data.insert_standard_food('食品1', 'food8')
+    # all_data.insert_standard_food('食品1', 'food9')
+    # all_data.insert_standard_food('食品3', 'food10')
 
 
 if __name__ == '__main__':

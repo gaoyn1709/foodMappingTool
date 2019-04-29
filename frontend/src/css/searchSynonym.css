@@ -1,0 +1,20 @@
+header {
+    text-align: center;
+    font-weight: bold;
+}
+
+.synonymSearched {
+    color: steelblue;
+}
+
+.nameSearched {
+    color: #f50;
+}
+.searchTree{
+    font-size: 1em;
+}
+.searchBar {
+    width: 500px;
+    height: 40px;
+    margin: 0 8px 8px 0;
+}

@@ -9,6 +9,7 @@ backend/data/templates/
 frontend/node_modules
 # testing
 frontend/coverage
+frontend/src/testData/
 # production
 frontend/build
 # misc
