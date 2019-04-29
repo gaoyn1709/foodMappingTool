@@ -1,5 +1,7 @@
 # foodMappingTool
 
+python版本是3.6及以上
+
 需要修改的主要是backend/lib/all_data.py
 
 使用的数据详见各个类的定义及文档说明，都在backend/lib/save文件夹下了
