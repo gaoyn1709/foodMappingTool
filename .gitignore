@@ -3,7 +3,7 @@
 backend/data/history/
 backend/static/
 backend/data/save/
-backend/data/templates/
+backend/templates/
 
 # dependencies
 frontend/node_modules
